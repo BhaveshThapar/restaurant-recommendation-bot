@@ -10,6 +10,7 @@
 /coverage
 
 /.next/
+/.vercel/
 /out/
 
 /build

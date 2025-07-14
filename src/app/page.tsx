@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Suggestions from '@/components/Suggestions';
+import type { ChatInterfaceRef } from '@/components/ChatInterface';
 
 const ChatInterface = dynamic(() => import('@/components/ChatInterface'), {
   ssr: false,
@@ -11,7 +12,7 @@ const ChatInterface = dynamic(() => import('@/components/ChatInterface'), {
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-t-lg">
         <h1 className="text-2xl font-bold mb-2">Restaurant Recommendation Bot</h1>
         <p className="text-blue-50">
-          Ask me about restaurants, cuisines, dishes, and more! I'll search Reddit and the web to give you the best recommendations.
+          Ask me about restaurants, cuisines, dishes, and more! I&apos;ll search Reddit and the web to give you the best recommendations.
         </p>
       </div>
       <div className="flex-1 flex items-center justify-center">
@@ -32,7 +33,7 @@ const ChatInterface = dynamic(() => import('@/components/ChatInterface'), {
 export default function Home() {
   const [showSuggestions, setShowSuggestions] = useState(true);
   const [isClient, setIsClient] = useState(false);
-  const chatInterfaceRef = useRef<any>(null);
+  const chatInterfaceRef = useRef<ChatInterfaceRef | null>(null);
 
   useEffect(() => {
     setIsClient(true);

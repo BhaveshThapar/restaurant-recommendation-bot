@@ -70,8 +70,8 @@ export class RestaurantChatbot {
   } {
     const lowerMessage = message.toLowerCase();
     
-    let shouldSearchReddit = true;
-    let shouldSearchWeb = true;
+    const shouldSearchReddit = true;
+    const shouldSearchWeb = true;
     let redditQuery = message;
     let webQuery = message;
 

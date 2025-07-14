@@ -1,5 +1,4 @@
 import axios from 'axios';
-import * as cheerio from 'cheerio';
 
 export interface WebSearchResult {
   title: string;
@@ -47,13 +46,6 @@ export class WebSearchService {
 
   private async searchWithFallback(query: string): Promise<string> {
     try {
-      const searchTerms = [
-        `${query} restaurant review`,
-        `${query} restaurant menu`,
-        `${query} restaurant yelp`,
-        `${query} restaurant tripadvisor`
-      ];
-
       const results: WebSearchResult[] = [];
       
       results.push({

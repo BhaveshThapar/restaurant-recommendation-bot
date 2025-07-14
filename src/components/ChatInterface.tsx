@@ -105,7 +105,7 @@ const ChatInterface = forwardRef<ChatInterfaceRef>((props, ref) => {
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-t-lg">
         <h1 className="text-2xl font-bold mb-2">Restaurant Recommendation Bot</h1>
         <p className="text-blue-50">
-          Ask me about restaurants, cuisines, dishes, and more! I'll search Reddit and the web to give you the best recommendations.
+          Ask me about restaurants, cuisines, dishes, and more! I&apos;ll search Reddit and the web to give you the best recommendations.
         </p>
       </div>
 
