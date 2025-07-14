@@ -41,7 +41,7 @@ The bot can handle various types of restaurant-related questions:
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/BhaveshThapar/restaurant-recommendation-bot.git
 cd restaurant-recommendation-bot
 ```
 
