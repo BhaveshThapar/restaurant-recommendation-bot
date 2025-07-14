@@ -7,6 +7,11 @@ export interface ChatMessage {
   content: string;
 }
 
+export interface ToolResult {
+  tool: string;
+  result: string;
+}
+
 export class GeminiService {
   private model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
   private chat: any;
@@ -47,28 +52,38 @@ Always be helpful, accurate, and provide actionable recommendations. When you us
     });
   }
 
-  async sendMessageWithTools(
-    userMessage: string,
-    redditResults?: string,
-    webResults?: string
-  ): Promise<string> {
+  async sendMessage(message: string, toolResults?: ToolResult[]): Promise<string> {
     try {
-      let prompt = userMessage;
-
-      if (redditResults && redditResults !== 'No relevant Reddit discussions found for this query.') {
-        prompt += `\n\nReddit Search Results:\n${redditResults}`;
+      let fullMessage = message;
+      
+      if (toolResults && toolResults.length > 0) {
+        fullMessage += '\n\nHere are the results from my search tools:\n';
+        toolResults.forEach(result => {
+          fullMessage += `\n--- ${result.tool.toUpperCase()} RESULTS ---\n${result.result}\n`;
+        });
+        fullMessage += '\nPlease provide a comprehensive response based on this information.';
       }
 
-      if (webResults && webResults !== 'No relevant web results found for this query.') {
-        prompt += `\n\nWeb Search Results:\n${webResults}`;
-      }
-
-      const result = await this.chat.sendMessage(prompt);
+      const result = await this.chat.sendMessage(fullMessage);
       const response = await result.response;
       return response.text();
     } catch (error) {
       console.error('Error sending message to Gemini:', error);
       return 'I apologize, but I encountered an error processing your request. Please try again.';
     }
+  }
+
+  async sendMessageWithTools(message: string, redditResults?: string, webResults?: string): Promise<string> {
+    const toolResults: ToolResult[] = [];
+    
+    if (redditResults) {
+      toolResults.push({ tool: 'Reddit', result: redditResults });
+    }
+    
+    if (webResults) {
+      toolResults.push({ tool: 'Web Search', result: webResults });
+    }
+
+    return this.sendMessage(message, toolResults);
   }
 } 

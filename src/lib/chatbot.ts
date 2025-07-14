@@ -30,6 +30,10 @@ export class RestaurantChatbot {
 
       if (searchStrategy.shouldSearchReddit) {
         redditResults = await this.redditService.searchReddit(searchStrategy.redditQuery || userMessage);
+        
+        if (redditResults && redditResults.includes('No relevant Reddit discussions found')) {
+          redditResults = undefined;
+        }
       }
 
       if (searchStrategy.shouldSearchWeb) {
@@ -83,10 +87,10 @@ export class RestaurantChatbot {
       
       if (location) {
         redditQuery = `best ${cuisine} restaurant ${location}`;
-        webQuery = `best ${cuisine} restaurants ${location} reviews`;
+        webQuery = `best ${cuisine} restaurants ${location} NYC reviews recommendations 2024`;
       } else {
         redditQuery = `best ${cuisine} restaurant`;
-        webQuery = `best ${cuisine} restaurants reviews`;
+        webQuery = `best ${cuisine} restaurants NYC reviews recommendations 2024`;
       }
     }
     
@@ -174,8 +178,7 @@ export class RestaurantChatbot {
   }
 
   private isComparisonQuery(message: string): boolean {
-    const comparisonKeywords = ['vs', 'versus', 'difference', 'compare', 'better'];
-    return comparisonKeywords.some(keyword => message.includes(keyword));
+    return message.includes('vs') || message.includes('versus') || message.includes('difference between');
   }
 
   private extractRestaurantsForComparison(message: string): string[] {
@@ -200,7 +203,7 @@ export class RestaurantChatbot {
       }
     }
     
-    return restaurants.slice(0, 2);
+    return restaurants.slice(0, 2); 
   }
 
   private isDishQuery(message: string): boolean {

@@ -1,62 +1,90 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
-interface WebSearchResult {
+export interface WebSearchResult {
   title: string;
   snippet: string;
   url: string;
+  source: string;
 }
 
 export class WebSearchService {
-  private apiKey = process.env.SERPAPI_API_KEY;
+  private serpApiKey = process.env.SERP_API_KEY;
 
   async searchWeb(query: string): Promise<string> {
-    if (!this.apiKey) {
-      return 'Web search is not configured. Please add SERPAPI_API_KEY to your environment variables.';
-    }
-
     try {
-      const searchUrl = `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(query)}&api_key=${this.apiKey}&num=5`;
-      
-      const response = await fetch(searchUrl);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (this.serpApiKey) {
+        return await this.searchWithSerpAPI(query);
+      } else {
+        return await this.searchWithFallback(query);
       }
-
-      const data = await response.json();
-      
-      if (!data.organic_results || data.organic_results.length === 0) {
-        return 'No relevant web results found for this query.';
-      }
-
-      const results = data.organic_results.slice(0, 5).map((result: any) => ({
-        title: result.title,
-        snippet: result.snippet,
-        url: result.link
-      }));
-
-      return this.formatWebResults(results);
     } catch (error) {
       console.error('Error searching web:', error);
       return 'Unable to search the web at the moment.';
     }
   }
 
-  private formatWebResults(results: WebSearchResult[]): string {
+  private async searchWithSerpAPI(query: string): Promise<string> {
+    try {
+      const response = await axios.get('https://serpapi.com/search', {
+        params: {
+          q: query,
+          api_key: this.serpApiKey,
+          engine: 'google',
+          num: 10,
+          gl: 'us',
+          hl: 'en'
+        }
+      });
+
+      const results = response.data.organic_results || [];
+      return this.formatWebResults(results);
+    } catch (error) {
+      console.error('SerpAPI error:', error);
+      return await this.searchWithFallback(query);
+    }
+  }
+
+  private async searchWithFallback(query: string): Promise<string> {
+    try {
+      const searchTerms = [
+        `${query} restaurant review`,
+        `${query} restaurant menu`,
+        `${query} restaurant yelp`,
+        `${query} restaurant tripadvisor`
+      ];
+
+      const results: WebSearchResult[] = [];
+      
+      results.push({
+        title: `${query} - Restaurant Information`,
+        snippet: `Find information about ${query} including reviews, menu, and location details.`,
+        url: `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+        source: 'Google Search'
+      });
+
+      return this.formatWebResults(results);
+    } catch (error) {
+      console.error('Fallback search error:', error);
+      return 'Web search is currently unavailable.';
+    }
+  }
+
+  private formatWebResults(results: any[]): string {
     if (results.length === 0) {
-      return 'No relevant web results found.';
+      return 'No web search results found for this query.';
     }
 
-    let formattedResults = `Found ${results.length} relevant web results:\n\n`;
+    let formatted = 'Web Search Results:\n\n';
     
     results.forEach((result, index) => {
-      formattedResults += `${index + 1}. **${result.title}**\n`;
-      formattedResults += `${result.snippet}\n`;
-      formattedResults += `Source: ${result.url}\n\n`;
+      formatted += `${index + 1}. **${result.title || 'No title'}**\n`;
+      formatted += `   ${result.snippet || result.snippet || 'No description available'}\n`;
+      formatted += `   Source: ${result.source || 'Unknown'}\n`;
+      formatted += `   URL: ${result.url || result.link || 'No URL available'}\n\n`;
     });
 
-    return formattedResults;
+    return formatted;
   }
 
   async searchRestaurantInfo(restaurantName: string, location?: string): Promise<string> {

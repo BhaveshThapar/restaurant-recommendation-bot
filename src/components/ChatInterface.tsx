@@ -19,11 +19,16 @@ export interface ChatInterfaceRef {
 }
 
 const ChatInterface = forwardRef<ChatInterfaceRef>((props, ref) => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: 'welcome-1',
+      role: 'assistant',
+      content: 'Hello! I\'m your restaurant recommendation assistant. I can help you find the best restaurants, compare options, suggest dishes, and provide detailed recommendations. What would you like to know about restaurants?'
+    }
+  ]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const messageIdCounter = useRef(1);
+  const messageIdCounter = useRef(1000);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -33,21 +38,8 @@ const ChatInterface = forwardRef<ChatInterfaceRef>((props, ref) => {
     scrollToBottom();
   }, [messages]);
 
-  useEffect(() => {
-    if (!isInitialized) {
-      setMessages([
-        {
-          id: '1',
-          role: 'assistant',
-          content: 'Hello! I\'m your restaurant recommendation assistant. I can help you find the best restaurants, compare options, suggest dishes, and provide detailed recommendations. What would you like to know about restaurants?'
-        }
-      ]);
-      setIsInitialized(true);
-    }
-  }, [isInitialized]);
-
   const generateMessageId = () => {
-    return (messageIdCounter.current++).toString();
+    return `msg-${messageIdCounter.current++}`;
   };
 
   const sendMessage = async (message: string) => {
@@ -118,43 +110,30 @@ const ChatInterface = forwardRef<ChatInterfaceRef>((props, ref) => {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
-        {!isInitialized ? (
+        {messages.map((message) => (
+          <ChatMessage
+            key={message.id}
+            role={message.role}
+            content={message.content}
+            sources={message.sources}
+          />
+        ))}
+        
+        {isLoading && (
           <div className="flex justify-start mb-4">
             <div className="bg-gray-100 text-gray-800 rounded-lg px-4 py-2">
               <div className="flex items-center space-x-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-                <span>Loading...</span>
+                <span>Searching for recommendations...</span>
               </div>
             </div>
           </div>
-        ) : (
-          <>
-            {messages.map((message) => (
-              <ChatMessage
-                key={message.id}
-                role={message.role}
-                content={message.content}
-                sources={message.sources}
-              />
-            ))}
-            
-            {isLoading && (
-              <div className="flex justify-start mb-4">
-                <div className="bg-gray-100 text-gray-800 rounded-lg px-4 py-2">
-                  <div className="flex items-center space-x-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-                    <span>Searching for recommendations...</span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </>
         )}
         
         <div ref={messagesEndRef} />
       </div>
 
-      <ChatInput onSendMessage={handleSendMessage} disabled={isLoading || !isInitialized} />
+      <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} />
     </div>
   );
 });
