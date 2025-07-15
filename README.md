@@ -1,3 +1,4 @@
+# View it here: https://restaurant-recommendation-bot.vercel.app/
 # Restaurant Recommendation Bot
 
 An AI-powered restaurant recommendation chatbot built with Next.js, Gemini AI, Reddit search, and web search capabilities. Get personalized restaurant recommendations, compare restaurants, and discover the best dishes using real-time data from Reddit and the web.
