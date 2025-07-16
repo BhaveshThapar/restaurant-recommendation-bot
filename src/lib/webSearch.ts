@@ -62,7 +62,7 @@ export class WebSearchService {
     }
   }
 
-  private formatWebResults(results: any[]): string {
+  private formatWebResults(results: any[]): string { // eslint-disable-line @typescript-eslint/no-explicit-any
     if (results.length === 0) {
       return 'No web search results found for this query.';
     }

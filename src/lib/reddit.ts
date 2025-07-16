@@ -62,7 +62,7 @@ export class RedditService {
           }
         });
 
-        const posts = response.data.data.children.map((child: any) => ({
+        const posts = response.data.data.children.map((child: any) => ({ // eslint-disable-line @typescript-eslint/no-explicit-any
           title: child.data.title,
           content: child.data.selftext || '',
           score: child.data.score,

@@ -14,7 +14,7 @@ export interface ToolResult {
 
 export class GeminiService {
   private model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-  private chat: any;
+  private chat: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   constructor() {
     this.chat = this.model.startChat({
